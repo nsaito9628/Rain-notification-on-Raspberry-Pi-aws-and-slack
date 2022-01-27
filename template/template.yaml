@@ -169,7 +169,7 @@ Resources:
                                     "view": "timeSeries",
                                     "stacked": false,
                                     "region": "ap-northeast-1",
-                                    "title": "Watch Over Sensor",
+                                    "title": "Rain Detection Sensor",
                                     "period": 60,
                                     "stat": "Sum"
                                 }

@@ -1,0 +1,26 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "cloudformation:CreateChangeSet",
+                "cloudformation:ExecuteChangeSet"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "cloudformation:DescribeStackEvents",
+                "cloudformation:DeleteStack",
+                "cloudformation:CreateChangeSet",
+                "cloudformation:DescribeChangeSet",
+                "cloudformation:GetTemplateSummary",
+                "cloudformation:DescribeStacks",
+                "cloudformation:ListStacks"
+            ],
+            "Resource": "arn:aws:cloudformation:ap-northeast-1:accountID:stack/*/*"
+        }
+    ]
+}

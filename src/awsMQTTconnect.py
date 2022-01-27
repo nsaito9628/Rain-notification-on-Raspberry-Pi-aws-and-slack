@@ -86,7 +86,7 @@ class Pub:
         if (sub_t_sec[-1]=='0' and sub_t_count!=0):
             self.rain_detect['Timestamp'] = int(time.time())
             self.rain_detect['datetime'] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')#get datetime to string
-            self.rain_detect['rain_drop'] = accum_rain
+            self.rain_detect['rain_detection'] = accum_rain
             print(self.rain_detect)
             self.client.publish(self.topic_dashboard, json.dumps(self.rain_detect, default=self.json_serial))  # publish
             accum_rain = 0

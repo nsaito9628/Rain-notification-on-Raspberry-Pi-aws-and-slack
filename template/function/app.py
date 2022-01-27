@@ -25,5 +25,5 @@ def post_slack():
 def lambda_handler(event, context):
     
     t = datetime.now(JST)
-    if 6 <= t.hour <=23:
+    if 6 <= t.hour <=18:
         post_slack()

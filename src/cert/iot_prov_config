@@ -1,0 +1,17 @@
+##########Global parameter##########################################################
+#
+#
+THING_NAME=rain_detection_pi
+#
+#
+##########System-to-watch-over-cats-with-a-raspberrypi default parameters###########
+#
+#
+#Topic to publish trigger for Lambda by rain detection
+TOPIC_LAMBDA=lambda
+#Topic to publishing rain detection sensor count
+TOPIC_DASHBOARD=dashboard
+# NC / NO flag of human detection sensor NC:0 NO:1
+SENSOR_NO=1
+#
+#

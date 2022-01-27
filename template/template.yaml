@@ -1,0 +1,179 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  SAM Template for Rain-Detection-Notifier deployment
+
+Globals:
+  Function:
+    Runtime: python3.8
+    Timeout: 5
+    MemorySize: 128
+    Architectures:
+      - arm64
+
+Parameters:
+  ProjectName:
+    Type: String
+    Default: RainDetection
+  Region:
+    Type: String
+    Default: "ap-northeast-1"
+  AccountID:
+    Type: String
+    Default: <Your AccountID>
+  Topic1:
+    Type: String
+    Default: dashboard
+  Topic2:
+    Type: String
+    Default: lambda
+  Metric1:
+    Type: String
+    Default: rain_detection
+  PostURL:
+    Type: String
+    Default: <Your Slack Webhook URL>
+  NameTag:
+    Type: String
+    Default: 'RainDetectionNotifier'
+
+Resources:
+  LambdaFunction:
+    Type: AWS::Serverless::Function 
+    Properties:
+      CodeUri: function/
+      FunctionName: !Sub ${ProjectName}Function
+      Handler: app.lambda_handler
+      Environment:
+        Variables:
+          URL: !Sub ${PostURL}
+      Events:
+        IoTRule:
+          Type: IoTRule
+          Properties:
+            AwsIotSqlVersion: 2016-03-23
+            Sql: !Sub "SELECT * FROM '${Topic2}'"
+      Role: !GetAtt LambdaFunctionRole.Arn
+      Tags:
+        Name: !Sub ${NameTag}
+  LambdaFunctionLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${LambdaFunction}
+      RetentionInDays: 7
+
+  LambdaFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Action: "sts:AssumeRole"
+            Principal:
+              Service: lambda.amazonaws.com
+      Policies:
+        - PolicyName: !Sub ${ProjectName}Policy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: "Allow"
+                Action:
+                  - "logs:CreateLogGroup"
+                  - "logs:CreateLogStream"
+                  - "logs:PutLogEvents"
+                Resource: 
+                  - "arn:aws:logs:*:*:*"
+              - Effect: "Allow"
+                Action: 
+                  - 'iot:Publish'
+                Resource: 
+                  - !Sub "arn:aws:iot:${AWS::Region}:${AWS::AccountId}:topic/*"
+              - Effect: "Allow"
+                Action: 
+                  - 'iot:DescribeEndpoint'
+                Resource: 
+                  - '*'
+
+
+# IoT ruleでCustom Metricsに出力するIAMロール
+  CustomMetricsRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - "iot.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      RoleName: !Sub ${ProjectName}CustomMetricsRole
+      Policies:
+        - PolicyName: !Sub ${ProjectName}CustomMetricsPolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: "Allow"
+                Action: "cloudwatch:PutMetricData"
+                Resource: "*"
+
+# IoTトピックルール
+  IoTRule1:
+    Type: AWS::IoT::TopicRule
+    Properties:
+      RuleName: !Sub ${ProjectName}IoTRule1
+      TopicRulePayload:
+        Actions:
+          - CloudwatchMetric:
+              MetricName: !Sub ${Metric1}
+              MetricNamespace: !Sub ${Topic1}
+              MetricUnit: None
+              MetricValue: !Join
+                            - ''
+                            - - '${'
+                              - !Sub ${Metric1}
+                              - '}'
+              RoleArn: !GetAtt CustomMetricsRole.Arn
+
+        AwsIotSqlVersion: "2016-03-23"
+        Description: String
+        RuleDisabled: false
+        Sql: !Sub
+          "SELECT * FROM '${Topic1}'"
+      Tags:
+        - Key: Name
+          Value: !Sub ${NameTag}
+
+  Dashboard:
+    Type: AWS::CloudWatch::Dashboard
+    Properties:
+      DashboardName: !Sub ${ProjectName}Dashboard
+      DashboardBody: !Sub 
+                      '{
+                        "widgets": [
+                            {
+                                "height": 6,
+                                "width": 12,
+                                "y": 0,
+                                "x": 0,
+                                "type": "metric",
+                                "properties": {
+                                    "metrics": [
+                                        [ 
+                                          "${Topic1}", 
+                                          "${Metric1}" 
+                                        ]
+                                    ],
+                                    "view": "timeSeries",
+                                    "stacked": false,
+                                    "region": "ap-northeast-1",
+                                    "title": "Rain Detection Sensor",
+                                    "period": 60,
+                                    "stat": "Sum"
+                                }
+                            }
+                            
+                        ]
+                    }'

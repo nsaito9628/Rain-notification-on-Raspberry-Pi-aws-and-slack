@@ -89,12 +89,13 @@ sudo chmod u+x environment.sh
   
 Set aws configuration as default profile  
 ```sh
-aws configure (Replace with your own key)  
-    AWS Access Key ID[]: your Access Key ID
-    AWS Secret Access Key []: your Secret Access Key
-    Default region name []: ap-northeast-1
-    Default output format []:
+aws configure 
 ```
+>(Replace with your own key)    
+    AWS Access Key ID[]: your Access Key ID  
+    AWS Secret Access Key []: your Secret Access Key  
+    Default region name []: ap-northeast-1  
+    Default output format []:  
 
 Customize parameters (if needed)  
 ``` sh
@@ -114,9 +115,11 @@ sudo chmod u+x iot_prov.sh
 ./iot_prov.sh
 ```
   
-Rewrite to your own parameters(if needed)
 ```sh
 cd ../Rain-notification-on-Raspberry-Pi-aws-and-slack/template
+```
+Rewrite to your own parameters(if needed)
+```
 sudo nano tmplate.yaml   
 ```
  
@@ -132,32 +135,31 @@ Deploy CloudFormation stack
 ```sh
 sam build
 sam deploy --guided --capabilities CAPABILITY_NAMED_IAM
-
-    #Enter any stack name and [Y/N]  
-        Stack Name [sam-app]: any-stack-name  
-        AWS Region [ap-northeast-1]: 
-        Parameter ProjectName [RainDetection]: 
-        Parameter Region [ap-northeast-1]: 
-        Parameter AccountID [Your AccountID]: 
-        Parameter Topic1 [dashboard]: 
-        Parameter Topic2 [lambda]: 
-        Parameter Metric1 [rain_detection]: 
-        Parameter PostURL [Your Slack Webhook URL]: 
-        Parameter NameTag [RainDetectionNotifier]: 
-        #Shows you resources changes to be deployed and require a 'Y' to initiate deploy
-        Confirm changes before deploy [Y/n]: Y
-        #SAM needs permission to be able to create roles to connect to the resources in your template
-        Allow SAM CLI IAM role creation [Y/n]: Y
-        #Preserves the state of previously provisioned resources when an operation fails
-        Disable rollback [Y/n]: Y
-        Save arguments to configuration file [Y/n]: Y
-        SAM configuration file [samconfig.toml]: 
-        SAM configuration environment [default]: 
-        ・  
-        ・  
-        ・  
-        Deploy this changeset? [y/N]: y
 ```
+>#Enter any stack name and [Y/N]  
+        Stack Name [sam-app]: any-stack-name    
+        AWS Region [ap-northeast-1]:  
+        Parameter ProjectName [RainDetection]:  
+        Parameter Region [ap-northeast-1]:  
+        Parameter AccountID [Your AccountID]:  
+        Parameter Topic1 [dashboard]:  
+        Parameter Topic2 [lambda]:  
+        Parameter Metric1 [rain_detection]:   
+        Parameter PostURL [Your Slack Webhook URL]:  
+        Parameter NameTag [RainDetectionNotifier]:  
+        #Shows you resources changes to be deployed and require a 'Y' to initiate deploy
+        Confirm changes before deploy [Y/n]: Y  
+        #SAM needs permission to be able to create roles to connect to the resources in your template  
+        Allow SAM CLI IAM role creation [Y/n]: Y  
+        #Preserves the state of previously provisioned resources when an operation fails
+        Disable rollback [Y/n]: Y  
+        Save arguments to configuration file [Y/n]: Y  
+        SAM configuration file [samconfig.toml]:  
+        SAM configuration environment [default]:  
+        ・  
+        ・  
+        ・  
+        Deploy this changeset? [y/N]: y  
 Confirm message like "Successfully created/updated stack - any-stack-name in ap-northeast-1"  
   
 Restart Raspberry Pi

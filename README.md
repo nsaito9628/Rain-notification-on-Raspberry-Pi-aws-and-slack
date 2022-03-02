@@ -77,7 +77,7 @@ git clone https://github.com/nsaito9628/Rain-notification-on-Raspberry-Pi-aws-an
   
 Deploy a project  
 ``` sh
-sudo cp ./Rain-notification-on-Raspberry-Pi-aws-and-slack/src/* ./*
+cp -r ./Rain-notification-on-Raspberry-Pi-aws-and-slack/src/* ~
 ```
 
 Download and unpack the required packages
